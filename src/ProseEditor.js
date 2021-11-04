@@ -1,7 +1,10 @@
-import { schema } from "prosemirror-schema-basic";
-import { EditorState, Plugin, PluginKey } from "prosemirror-state";
-import { EditorView } from "prosemirror-view";
+import { EditorState, Plugin, PluginKey } from 'prosemirror-state';
+import { EditorView } from 'prosemirror-view';
+import { schema, defaultMarkdownParser, defaultMarkdownSerializer } from 'prosemirror-markdown';
 import React, { useEffect, useRef } from "react";
+import {undo, redo, history } from 'prosemirror-history';
+import { keymap } from 'prosemirror-keymap';
+import { baseKeymap } from 'prosemirror-commands';
 
 const reactPropsKey = new PluginKey("reactProps");
 
@@ -15,13 +18,36 @@ function reactProps(initialProps) {
   });
 }
 
+function createEditorView(place, reactPlugin) {
+  const state = EditorState.create({ 
+    doc: defaultMarkdownParser.parse("# Test"), 
+    plugins: [
+      reactPlugin,
+      history(),
+      keymap({
+        'Mod-z': undo,
+        'Mod-y': redo
+      }),
+      keymap(baseKeymap)
+    ]
+  });
+  const view = new EditorView(place, { 
+    state,
+    dispatchTransaction(transaction) {
+      console.log(transaction.doc.content.toString());
+      const newState = view.state.apply(transaction);
+      view.updateState(newState);
+    }
+  });
+  return view;
+}
+
 function ProseEditor(props) {
   const viewHost = useRef();
   const view = useRef(null);
 
   useEffect(() => { // initial render
-    const state = EditorState.create({ schema, plugins: [reactProps(props)] });
-    view.current = new EditorView(viewHost.current, { state });
+    view.current = createEditorView(viewHost.current, reactProps(props))
     return () => view.current.destroy();
   }, []);
 
