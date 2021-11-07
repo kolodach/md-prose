@@ -1,9 +1,13 @@
 import { EditorState, Plugin, PluginKey } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
-import { schema, defaultMarkdownParser } from 'prosemirror-markdown';
 import React, { useEffect, useRef } from "react";
 import './ProseEditor.css';
 import { createPlugins } from './plugins';
+import { schema } from './schema';
+import { createParser } from './parser';
+import { mathSerializer } from '@benrbray/prosemirror-math';
+import "@benrbray/prosemirror-math/style/math.css";
+import "katex/dist/katex.min.css";
 
 const reactPropsKey = new PluginKey("reactProps");
 
@@ -18,10 +22,11 @@ function reactProps(initialProps) {
 }
 
 function createEditorView(place, reactPlugin) {
+  const markdownParser = createParser(schema);
   const plugins = createPlugins(schema);
   plugins.push(reactPlugin);
   const state = EditorState.create({ 
-    doc: defaultMarkdownParser.parse("# Test"), 
+    doc: markdownParser.parse("# Test"), 
     plugins,
   });
   const view = new EditorView(place, { 
@@ -30,7 +35,10 @@ function createEditorView(place, reactPlugin) {
       // console.log(transaction.doc.content.toString());
       const newState = view.state.apply(transaction);
       view.updateState(newState);
-    }
+    },
+    clipboardTextParser: (slice) => {
+      return mathSerializer.serializeSlice(slice);
+    },
   });
   return view;
 }

@@ -6,6 +6,10 @@ import {
   ellipsis,
   wrappingInputRule,
 } from 'prosemirror-inputrules';
+import {
+	makeBlockMathInputRule, makeInlineMathInputRule,
+	REGEX_INLINE_MATH_DOLLARS, REGEX_BLOCK_MATH_DOLLARS
+} from "@benrbray/prosemirror-math";
 
 export function headingRule(nodeType) {
   return textblockTypeInputRule(
@@ -45,5 +49,12 @@ export function buildInputRules(schema) {
   rules.push(codeBlockRule(schema.nodes.code_block));
   rules.push(blockQuoteRule(schema.nodes.blockQuoteRule));
   rules.push(headingRule(schema.nodes.heading));
+  
+  // prosermirror-math
+  rules.push(makeInlineMathInputRule(
+    REGEX_INLINE_MATH_DOLLARS, schema.nodes.math_inline));
+  rules.push(makeBlockMathInputRule(
+    REGEX_BLOCK_MATH_DOLLARS, schema.nodes.math_display));
+
   return inputRules({rules});
 }
