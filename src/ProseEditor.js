@@ -2,12 +2,8 @@ import { EditorState, Plugin, PluginKey } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
 import { schema, defaultMarkdownParser } from 'prosemirror-markdown';
 import React, { useEffect, useRef } from "react";
-import { history } from 'prosemirror-history';
 import './ProseEditor.css';
-import { buildInputRules } from './inputrules';
-import { createKeymap } from './keymap';
-import { keymap } from 'prosemirror-keymap';
-import { baseKeymap } from 'prosemirror-commands';
+import { createPlugins } from './plugins';
 
 const reactPropsKey = new PluginKey("reactProps");
 
@@ -22,15 +18,11 @@ function reactProps(initialProps) {
 }
 
 function createEditorView(place, reactPlugin) {
+  const plugins = createPlugins(schema);
+  plugins.push(reactPlugin);
   const state = EditorState.create({ 
     doc: defaultMarkdownParser.parse("# Test"), 
-    plugins: [
-      buildInputRules(schema),
-      reactPlugin,
-      history(),
-      keymap(createKeymap(schema)),
-      keymap(baseKeymap),
-    ]
+    plugins,
   });
   const view = new EditorView(place, { 
     state,
