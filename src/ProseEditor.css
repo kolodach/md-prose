@@ -1,0 +1,12 @@
+.ProseMirror {
+    overflow: auto;
+    height: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+}
+
+.prosemirrorWrapper {
+    box-sizing: border-box;
+    padding: 24px;
+    height: 100%;
+}

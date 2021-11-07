@@ -1,4 +1,5 @@
 import ProseEditor from './ProseEditor';
+import './App.css';
 
 function App() {
   return (
