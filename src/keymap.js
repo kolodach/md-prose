@@ -92,8 +92,8 @@ export function createKeymap(schema, mapKeys) {
   // eslint-disable-next-line no-cond-assign
   if (type = schema.nodes.list_item) {
     bind("Enter", splitListItem(type))
-    bind("Mod-[", liftListItem(type))
-    bind("Mod-]", sinkListItem(type))
+    bind("Shift-Tab", liftListItem(type))
+    bind("Tab", sinkListItem(type))
   }
   // eslint-disable-next-line no-cond-assign
   if (type = schema.nodes.paragraph)
